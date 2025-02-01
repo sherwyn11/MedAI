@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 
 import { Nav } from "react-bootstrap";
@@ -27,27 +27,45 @@ function Sidebar({ color, image, routes }) {
   const activeRoute = (routeName) => {
     return location.pathname.indexOf(routeName) > -1 ? "active" : "";
   };
+  const [error, setError] = useState("");
+
+  const handleSOS = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          // Open Google Maps with nearby hospitals search
+          const googleMapsURL = `https://www.google.com/maps/search/hospitals/@${lat},${lon},15z`;
+          window.open(googleMapsURL, "_blank");
+        },
+        (err) => {
+          console.error("Geolocation error:", err);
+          setError("Location access denied. Enable location services.");
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
+    }
+  };
+
   return (
     <div className="sidebar" data-image={image} data-color={color}>
       <div
         className="sidebar-background"
         style={{
-          backgroundImage: "url(" + image + ")"
+          backgroundImage: "url(" + image + ")",
         }}
       />
       <div className="sidebar-wrapper">
         <div className="logo d-flex align-items-center justify-content-start">
-          <a
-            href="https://www.creative-tim.com?ref=lbd-sidebar"
-            className="simple-text logo-mini mx-1"
-          >
+          <a className="simple-text logo-mini mx-1">
             <div className="logo-img">
               <img src={require("assets/img/reactlogo.png")} alt="..." />
             </div>
           </a>
-          <a className="simple-text" href="http://www.creative-tim.com">
-            Creative Tim
-          </a>
+          <a className="simple-text">MedAI</a>
         </div>
         <Nav>
           {routes.map((prop, key) => {
@@ -73,6 +91,21 @@ function Sidebar({ color, image, routes }) {
               );
             return null;
           })}
+          <button
+            onClick={handleSOS}
+            style={{
+              backgroundColor: "red",
+              color: "white",
+              padding: "8px",
+              margin: "16px",
+              fontSize: "14px",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            🚨 SOS (Find Nearest Hospital)
+          </button>
         </Nav>
       </div>
     </div>

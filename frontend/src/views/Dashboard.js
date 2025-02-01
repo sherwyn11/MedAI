@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ChartistGraph from "react-chartist";
+import "bootstrap/dist/css/bootstrap.min.css";
 // react-bootstrap components
 import {
   Badge,
@@ -17,58 +18,74 @@ import {
 } from "react-bootstrap";
 
 function Dashboard() {
+  const [fileName, setFileName] = useState("");
+  const [filePreview, setFilePreview] = useState("");
+  const [error, setError] = useState("");
+  let [file, setFile] = useState(null);
+
+  useEffect(() => {
+    const fileInput = document.querySelector(".custom-file-input");
+    if (fileInput) {
+      fileInput.addEventListener("change", function () {
+        let fileName = this.files[0] ? this.files[0].name : "Choose file";
+        this.nextElementSibling.innerText = fileName;
+      });
+    }
+  }, []);
+  const handleFileChange = (event) => {
+    file = event.target.files[0];
+    setFile(event.target.files[0]);
+  };
+  const handleFileUpload = (event) => {};
+
   return (
     <>
       <Container fluid>
         <Row>
-          <Col lg="3" sm="6">
+          <Col lg="6" sm="12">
             <Card className="card-stats">
               <Card.Body>
                 <Row>
-                  <Col xs="5">
+                  <Col xs="3">
                     <div className="icon-big text-center icon-warning">
                       <i className="nc-icon nc-chart text-warning"></i>
                     </div>
                   </Col>
-                  <Col xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Number</p>
-                      <Card.Title as="h4">150GB</Card.Title>
+                  <Col>
+                    <p className="card-category mb-2">Upload Image</p>
+                    <div className="input-group">
+                      <div className="custom-file">
+                        <input
+                          type="file"
+                          className="custom-file-input"
+                          id="file-upload"
+                          onChange={handleFileChange}
+                        />
+                        <label
+                          className="custom-file-label"
+                          htmlFor="file-upload"
+                        >
+                          Choose file
+                        </label>
+                      </div>
+                      <Button
+                        variant="primary"
+                        as="label"
+                        htmlFor="file-upload"
+                        onClick={handleFileUpload}
+                        style={{ padding: "5px 12px" }}
+                      >
+                        Upload
+                      </Button>
                     </div>
                   </Col>
                 </Row>
               </Card.Body>
               <Card.Footer>
-                <hr></hr>
+                <hr />
                 <div className="stats">
                   <i className="fas fa-redo mr-1"></i>
                   Update Now
-                </div>
-              </Card.Footer>
-            </Card>
-          </Col>
-          <Col lg="3" sm="6">
-            <Card className="card-stats">
-              <Card.Body>
-                <Row>
-                  <Col xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-light-3 text-success"></i>
-                    </div>
-                  </Col>
-                  <Col xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Revenue</p>
-                      <Card.Title as="h4">$ 1,345</Card.Title>
-                    </div>
-                  </Col>
-                </Row>
-              </Card.Body>
-              <Card.Footer>
-                <hr></hr>
-                <div className="stats">
-                  <i className="far fa-calendar-alt mr-1"></i>
-                  Last day
                 </div>
               </Card.Footer>
             </Card>
@@ -261,31 +278,11 @@ function Dashboard() {
                       ],
                       series: [
                         [
-                          542,
-                          443,
-                          320,
-                          780,
-                          553,
-                          453,
-                          326,
-                          434,
-                          568,
-                          610,
-                          756,
+                          542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756,
                           895,
                         ],
                         [
-                          412,
-                          243,
-                          280,
-                          580,
-                          453,
-                          353,
-                          300,
-                          364,
-                          368,
-                          410,
-                          636,
+                          412, 243, 280, 580, 453, 353, 300, 364, 368, 410, 636,
                           695,
                         ],
                       ],
