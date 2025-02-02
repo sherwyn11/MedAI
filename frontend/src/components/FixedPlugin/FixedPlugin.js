@@ -91,7 +91,7 @@ function FixedPlugin() {
       setUserInput("");
       setIsTyping(true); // Show typing indicator for the bot
 
-      const res = await fetch("http://localhost:5000/ask", {
+      const res = await fetch("http://localhost:5002/ask", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
