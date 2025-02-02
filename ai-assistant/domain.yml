@@ -1,0 +1,148 @@
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+intents:
+- greet
+- goodbye
+- affirm
+- deny
+- bot_challenge
+- nearby_location
+- find_product_by_name
+- get_order_history
+- qty_entry
+- get_product_by_id
+- thanks
+- help
+- set_reminder
+- time_entry
+- get_reminders
+entities:
+- product
+- product_id
+- quantity
+- location_name
+- latitude
+- longitude
+- CARDINAL
+- time
+- LOC
+- recurrence
+slots:
+  latitude:
+    type: text
+    auto_fill: false
+  location_name:
+    type: text
+    auto_fill: false
+  longitude:
+    type: text
+    auto_fill: false
+  phone_no:
+    type: unfeaturized
+    auto_fill: false
+  product:
+    type: text
+  product_id:
+    type: text
+  quantity:
+    type: text
+  requested_slot:
+    type: unfeaturized
+  time:
+    type: unfeaturized
+    auto_fill: true
+  recurrence:
+    type: text
+responses:
+  utter_greet:
+  - text: Hi👋! How can I help you?
+  utter_try_these:
+  - buttons:
+    - payload: /bot_challenge
+      title: Tell me more about yourself
+    text: "Hey there\U0001F44B! I'm your Medical Drug Assistant.\nThere's a lot I\
+      \ can help you with. Here are few popular actions."
+  utter_getting_order_history:
+  - text: Please wait while I fetch your order history...
+  utter_getting_location:
+  - text: One moment analyzing and setting location...
+  - text: Please wait while I analyze & set your location preferences...
+  utter_affirm_location:
+  - text: Your home location is {location_name}. ({latitude}, {longitude}) Did I get
+      the address right?
+  utter_save_location:
+  - text: Alright, I'll remember that.
+  utter_ask_location:
+  - text: Sorry, I didn't get that. What should I remember your nearby location as?
+  - text: Ok. Let's fix that. What's your closest landmark?
+  utter_specify_quantity:
+  - text: Please specify quantity
+  utter_specify_id:
+  - text: Enter product id
+  utter_did_that_help:
+  - text: Did that help you?
+  - text: I hope you got what you were looking for...
+  utter_happy:
+  - text: Great, carry on👋!
+  utter_searching:
+  - text: Searching...
+  - text: I'm fetching the details for you...
+  - text: Here is the top search result...
+  utter_ask_place_order:
+  - text: Should I proceed with placing this order?
+  utter_placing_order:
+  - text: Ok, I'm placing your order...
+  - text: Ok. I have placed your order.
+  utter_cancel:
+  - text: Ok. Do you need any more assistance?
+  - text: Roger that.
+  utter_goodbye:
+  - text: Goodbye👋, take care!
+  - text: Auf wiedersehen. That's goodbye in German👋
+  utter_iamabot:
+  - text: "I'm your Medical Assistant, powered by Blockchain & Rasa.\nI can help\
+      \ you in things like:\n* Ordering medicines\n* Setting reminders\n* Searching\
+      \ for Drug Manufacturers"
+  - text: "My name: Pharma Drug Bot, powered by Blockchain & Rasa.\nMy mission: to\
+      \ assist you in things like:\n* Ordering medicines\n* Setting reminders\n\
+      * Searching for Drug Manufacturers"
+  utter_ask_need_assistance:
+  - text: How else could I help you?
+  - text: How can I be of further assistance?
+  utter_getting_reminders:
+  - text: "Fetching your reminders..."
+  utter_setting_reminder:
+  - text: "Setting your reminder now..."
+  utter_ask_specific_time:
+  - text: "Please specify a time for your reminder."
+actions:
+- action_set_reminder
+- action_set_recurring_reminder
+- action_get_reminders
+- action_find_product
+- action_find_location
+- action_get_order_history
+- utter_ask_need_assistance
+- utter_greet
+- utter_try_these
+- utter_getting_location
+- utter_getting_order_history
+- utter_affirm_location
+- utter_ask_location
+- utter_save_location
+- utter_specify_quantity
+- utter_specify_id
+- utter_did_that_help
+- utter_happy
+- utter_searching
+- utter_ask_place_order
+- utter_placing_order
+- utter_cancel
+- utter_goodbye
+- utter_iamabot
+- utter_setting_reminder
+- utter_ask_specific_time
+- utter_getting_reminders
+forms:
+- order_product_form
