@@ -1,34 +1,11 @@
-/*!
-
-=========================================================
-* Light Bootstrap Dashboard React - v2.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/light-bootstrap-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-/*eslint-disable*/
-import React, { Component, useState } from "react";
-
-import { Dropdown, Badge, Button, Form } from "react-bootstrap";
-
-import sideBarImage1 from "assets/img/sidebar-1.jpg";
-import sideBarImage2 from "assets/img/sidebar-2.jpg";
-import sideBarImage3 from "assets/img/sidebar-3.jpg";
-import sideBarImage4 from "assets/img/sidebar-4.jpg";
+import React, { useState, useEffect, useRef } from "react";
 
 function FixedPlugin() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
 
   const chatWindowStyle = {
     position: "fixed",
@@ -112,6 +89,7 @@ function FixedPlugin() {
     if (userInput.trim()) {
       setMessages([...messages, { sender: "user", text: userInput }]);
       setUserInput("");
+      setIsTyping(true); // Show typing indicator for the bot
 
       const res = await fetch("http://localhost:5002/ask", {
         method: "POST",
@@ -121,9 +99,38 @@ function FixedPlugin() {
         body: JSON.stringify({ userInput }),
       });
       const data = await res.json();
+      setIsTyping(false); // Hide typing indicator after receiving bot's response
       setMessages([...messages, { sender: "user", text: userInput }, ...data]);
     }
   };
+
+  const renderButtons = (buttons) => {
+    return buttons.map((button, idx) => (
+      <button
+        key={idx}
+        onClick={() => setUserInput(button.payload)} // Set payload on button click
+        style={{
+          backgroundColor: "#007bff",
+          color: "#fff",
+          border: "none",
+          padding: "8px 12px",
+          borderRadius: "5px",
+          cursor: "pointer",
+          marginTop: "5px",
+          width: "100%",
+        }}
+      >
+        {button.title}
+      </button>
+    ));
+  };
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   return (
     <div>
       <button
@@ -155,9 +162,34 @@ function FixedPlugin() {
                 key={index}
                 style={msg.sender === "user" ? userMsgStyle : botMsgStyle}
               >
-                {msg.text}
+                {msg.text?.split("\n")?.map((line, index) => (
+                  <span key={index}>
+                    {line}
+                    <br />
+                  </span>
+                ))}
+                {msg.buttons && renderButtons(msg.buttons)}{" "}
+                {/* Render buttons if present */}
               </div>
             ))}
+            {isTyping && (
+              <div
+                style={{
+                  backgroundColor: "#f1f1f1",
+                  padding: "8px",
+                  margin: "5px 0",
+                  borderRadius: "10px",
+                  alignSelf: "flex-start",
+                  maxWidth: "80%",
+                  wordWrap: "break-word",
+                  marginTop: "5px",
+                  display: "inline-block",
+                }}
+              >
+                <span className="typing-indicator">...</span>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
           <div style={inputAreaStyle}>
             <input
