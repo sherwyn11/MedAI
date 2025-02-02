@@ -9,6 +9,7 @@ import {
   Button,
   Card,
   Navbar,
+  ProgressBar,
   Nav,
   Table,
   Container,
@@ -22,9 +23,28 @@ import axios from "axios";
 import Web3 from "web3";
 
 function Dashboard() {
-  // State for Fitbit API data
-const [fitbitData, setFitbitData] = useState(null);
+// State for Fitbit API data
+const [fitbitData, setFitbitData, setCaloriesBurned] = useState(null);
+// const [error, setError] = useState("");
 
+// Fitbit OAuth Config
+const CLIENT_ID = "23Q5R5";
+const REDIRECT_URI = "http://localhost:3000/admin/dashboard";
+const AUTH_URL = `https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=activity%20heartrate%20profile`;
+
+// Handle Fitbit OAuth login
+const handleFitbitLogin = () => {
+  window.location.href = AUTH_URL; // Redirect to Fitbit OAuth
+};
+
+// Extract access token when the component mounts
+useEffect(() => {
+  if (window.location.hash) {
+    handleTokenExtraction();
+  }
+}, []);
+
+// Extract token from URL and fetch data
 const handleTokenExtraction = () => {
   const urlParams = new URLSearchParams(window.location.hash.slice(1));
   const accessToken = urlParams.get("access_token");
@@ -34,17 +54,21 @@ const handleTokenExtraction = () => {
   }
 };
 
+// Fetch Fitbit Data from API
 const fetchFitbitData = (token) => {
-  const apiUrl = "https://api.fitbit.com/1/user/-/activities.json"; // Example endpoint for activity data
+  const apiUrl = "https://api.fitbit.com/1/user/-/activities.json"; // Example endpoint
+
   fetch(apiUrl, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   })
     .then((response) => response.json())
+
     .then((data) => {
       setFitbitData(data);
-      setError(""); // Clear any previous errors
+      setCaloriesBurned(data?.summary?.caloriesOut || 0); // Extract calories
+      setError(""); // Clear errors
     })
     .catch((err) => {
       console.error("Error fetching Fitbit data:", err);
@@ -52,21 +76,30 @@ const fetchFitbitData = (token) => {
     });
 };
 
-// Extract access token when the component mounts or URL changes
-useEffect(() => {
-  if (window.location.hash) {
-    handleTokenExtraction();
-  }
-}, [])
+// Extract Active Step Performance from Fitbit Data
+const getActiveSteps = () => {
+  return fitbitData?.lifetime?.total?.steps || 0;
+};
 
-  // Fitbit OAuth integration
-  const CLIENT_ID = "23Q5R5";
-  const REDIRECT_URI = "http://localhost:3000/admin/dashboard"; 
-  const AUTH_URL = `https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=activity%20heartrate%20profile`;
+const getCaloriesBurned = () => {
+  return fitbitData?.summary?.caloriesOut || 0; // Extract calories burned, fallback to 0 if not available
+};
 
-  const handleFitbitLogin = () => {
-    window.location.href = AUTH_URL; // Redirect to Fitbit OAuth
-  }
+
+// Define the target step goal (e.g., 10,000 steps per day)
+const STEP_GOAL = 10000;
+const stepsCovered = getActiveSteps();
+const progressPercentage = Math.min((stepsCovered / STEP_GOAL) * 100, 100); // Limit to 100%
+const circleRadius = 60; // Radius of the progress circle
+const circleCircumference = 2 * Math.PI * circleRadius; // Total length of the stroke
+const progressStroke = (progressPercentage / 100) * circleCircumference; // Filled stroke length
+const CALORIE_GOAL = 500; // Set a goal for calories burned, adjust as necessary
+const caloriesBurned = getCaloriesBurned(); // Function that fetches calories burned from fitbitData
+const calorieProgressPercentage = Math.min((caloriesBurned / CALORIE_GOAL) * 100, 100); // Limit to 100%
+const calorieCircleRadius = 60; // Radius of the progress circle for calories
+const calorieCircleCircumference = 2 * Math.PI * calorieCircleRadius; // Total length of the stroke for calories
+const calorieStroke = (calorieProgressPercentage / 100) * calorieCircleCircumference; // Filled stroke length for calories
+
 
   
   const [fileName, setFileName] = useState("");
@@ -758,41 +791,89 @@ useEffect(() => {
     </Card.Footer>
   </Card>
 </Col>
+<Col>
+<Card
+  className="shadow-lg rounded-4 text-center text-white"
+  style={{
+    maxWidth: "500px", // Increased the width to make the card rectangular
+    width: "100%",
+    background: "linear-gradient(to right, #141e30, #243b55)",
+    margin: "0 auto", // Center the card horizontally
+  }}
+>
+  <Card.Body className="p-4">
+    <h2 className="fw-bold mb-3">🏃 Fitbit Tracker</h2>
 
-        </Row>
-          {/* Fitbit Login Button */}
-      <div>
-        <button
-          onClick={handleFitbitLogin}
-          style={{
-            backgroundColor: "#28a745",
-            color: "white",
-            padding: "15px",
-            fontSize: "20px",
-            border: "none",
-            borderRadius: "10px",
-            cursor: "pointer",
-          }}
-        >
-          Connect to Fitbit
-        </button>
+    {/* Fitbit Login Button */}
+    <Button
+      onClick={handleFitbitLogin}
+      className="w-100 mb-4 fw-semibold"
+      style={{
+        background: "linear-gradient(to right, #27AE60, #219653)",
+        border: "none",
+        color: "white",
+      }}
+    >
+      Connect to Fitbit
+    </Button>
+
+    {/* Step Meter */}
+    {fitbitData ? (
+      <div className="d-flex justify-content-center align-items-center">
+        {/* Steps Circular Meter */}
+        <div className="d-flex justify-content-center align-items-center flex-column">
+          <svg width="140" height="140" viewBox="0 0 160 160" className="position-relative">
+            {/* Background Circle */}
+            <circle
+              cx="80"
+              cy="80"
+              r={circleRadius}
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.2)"
+              strokeWidth="12"
+            />
+            {/* Progress Circle */}
+            <circle
+              cx="80"
+              cy="80"
+              r={circleRadius}
+              fill="none"
+              stroke="#27AE60"
+              strokeWidth="12"
+              strokeDasharray={circleCircumference}
+              strokeDashoffset={circleCircumference - progressStroke}
+              strokeLinecap="round"
+              transform="rotate(-90 80 80)"
+            />
+            {/* Step Count Display */}
+            <text x="80" y="85" textAnchor="middle" fontSize="20" fill="white" fontWeight="bold">
+              {stepsCovered}
+            </text>
+            <text x="80" y="110" textAnchor="middle" fontSize="12" fill="white">
+              steps
+            </text>
+          </svg>
+          <p className="mt-3">Goal: <strong>{STEP_GOAL} steps</strong></p>
+        </div>
       </div>
+    ) : error ? (
+      <div>
+        <p className="text-danger fw-semibold">{error}</p>
+        <Button variant="danger" onClick={handleFitbitLogin}>Retry</Button>
+      </div>
+    ) : (
+      <p className="text-white-50">⌛ Waiting for Fitbit data...</p>
+    )}
+  </Card.Body>
+</Card>
 
 
 
-      {/* Display Fitbit Data */}
-      {fitbitData ? (
-          <div>
-            <h3>Your Fitbit Activity</h3>
-            <pre>{JSON.stringify(fitbitData, null, 2)}</pre>
-            {/* You can also format the data in a more user-friendly way */}
-          </div>
-        ) : error ? (
-          <p style={{ color: "red" }}>{error}</p>
-        ) : (
-          <p>Waiting for Fitbit data...</p>
-        )}          
-      </Container>
+</Col>
+</Row>
+
+        
+  </Container>
   );
 }
 
