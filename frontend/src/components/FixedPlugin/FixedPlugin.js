@@ -16,7 +16,7 @@
 
 */
 /*eslint-disable*/
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 
 import { Dropdown, Badge, Button, Form } from "react-bootstrap";
 
@@ -31,194 +31,149 @@ function FixedPlugin({
   color,
   setColor,
   image,
-  setImage
+  setImage,
 }) {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     classes: "dropdown show-dropdown open",
-  //     bg_checked: true,
-  //     bgImage: this.props.bgImage,
-  //   };
-  // }
-  // handleClick = () => {
-  //   this.props.handleFixedClick();
-  // };
-  // onChangeClick = () => {
-  //   this.props.handleHasImage(!this.state.bg_checked);
-  //   this.setState({ bg_checked: !this.state.bg_checked });
-  // };
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [userInput, setUserInput] = useState("");
+
+  const chatWindowStyle = {
+    position: "fixed",
+    bottom: "70px", // Keeps space for the button above
+    right: "20px",
+    width: "350px", // Increased the width of the chat window
+    height: "450px", // Adjusted the height slightly
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+    display: "flex",
+    flexDirection: "column",
+    border: "1px solid #ddd",
+    overflow: "hidden", // To make sure no content goes outside
+    zIndex: 999, // Ensure it stays above other content
+  };
+
+  const messagesStyle = {
+    flexGrow: "1",
+    overflowY: "auto",
+    padding: "10px",
+    fontSize: "14px",
+    display: "flex",
+    flexDirection: "column", // Change from column-reverse to column
+  };
+
+  const userMsgStyle = {
+    backgroundColor: "#d1f7c4",
+    padding: "8px",
+    margin: "5px 0",
+    borderRadius: "10px",
+    alignSelf: "flex-end", // Right-aligned for user
+    maxWidth: "80%",
+    wordWrap: "break-word", // Ensures long words don't overflow
+  };
+
+  const botMsgStyle = {
+    backgroundColor: "#f1f1f1",
+    padding: "8px",
+    margin: "5px 0",
+    borderRadius: "10px",
+    alignSelf: "flex-start", // Left-aligned for bot
+    maxWidth: "80%",
+    wordWrap: "break-word", // Ensures long words don't overflow
+    marginTop: "5px", // Ensure bot's message is below the user's message
+  };
+
+  const inputAreaStyle = {
+    display: "flex",
+    padding: "10px",
+    backgroundColor: "#f7f7f7",
+    borderTop: "1px solid #ddd",
+  };
+
+  const inputStyle = {
+    flexGrow: "1",
+    padding: "8px",
+    borderRadius: "5px",
+    border: "1px solid #ddd",
+    marginRight: "10px",
+  };
+
+  const sendButtonStyle = {
+    padding: "8px 15px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  };
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleInputChange = (e) => {
+    setUserInput(e.target.value);
+  };
+
+  const handleSendMessage = () => {
+    if (userInput.trim()) {
+      setMessages([
+        ...messages,
+        { sender: "user", text: userInput },
+        { sender: "bot", text: "This is a bot response!" }, // You can customize the bot's response logic here
+      ]);
+      setUserInput("");
+    }
+  };
   return (
-    <div className="fixed-plugin">
-      <Dropdown>
-        <Dropdown.Toggle
-          id="dropdown-fixed-plugin"
-          variant=""
-          className="text-white border-0 opacity-100"
-        >
-          <i className="fas fa-cogs fa-2x mt-1"></i>
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-          <li className="adjustments-line d-flex align-items-center justify-content-between">
-            <p>Background Image</p>
-            <Form.Check
-              type="switch"
-              id="custom-switch-1-image"
-              checked={hasImage}
-              onChange={setHasImage}
+    <div>
+      <button
+        onClick={handleToggle}
+        style={{
+          position: "fixed",
+          bottom: "20px", // Stick to bottom-right
+          right: "20px", // Stick to right edge
+          maxWidth: "100%",
+          padding: "10px 20px",
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: "50px",
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+          cursor: "pointer",
+          zIndex: 1000, // Ensure the button is on top of other elements
+        }}
+      >
+        {isOpen ? "Close Chat" : "Chat with us"}
+      </button>
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div style={chatWindowStyle}>
+          <div style={messagesStyle}>
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                style={msg.sender === "user" ? userMsgStyle : botMsgStyle}
+              >
+                {msg.text}
+              </div>
+            ))}
+          </div>
+          <div style={inputAreaStyle}>
+            <input
+              type="text"
+              value={userInput}
+              onChange={handleInputChange}
+              style={inputStyle}
+              placeholder="Type a message"
             />
-          </li>
-          <li className="adjustments-line mt-3">
-            <p>Filters</p>
-            <div className="pull-right">
-              <Badge
-                variant="secondary"
-                className={color === "black" ? "active" : ""}
-                onClick={() => setColor("black")}
-              ></Badge>
-              <Badge
-                variant="azure"
-                className={color === "azure" ? "active" : ""}
-                onClick={() => setColor("azure")}
-              ></Badge>
-              <Badge
-                variant="green"
-                className={color === "green" ? "active" : ""}
-                onClick={() => setColor("green")}
-              ></Badge>
-              <Badge
-                variant="orange"
-                className={color === "orange" ? "active" : ""}
-                onClick={() => setColor("orange")}
-              ></Badge>
-              <Badge
-                variant="red"
-                className={color === "red" ? "active" : ""}
-                onClick={() => setColor("red")}
-              ></Badge>
-              <Badge
-                variant="purple"
-                className={color === "purple" ? "active" : ""}
-                onClick={() => setColor("purple")}
-              ></Badge>
-            </div>
-            <div className="clearfix"></div>
-          </li>
-          <li className="header-title">Sidebar Images</li>
-          <li className={image === sideBarImage1 ? "active" : ""}>
-            <a
-              className="img-holder switch-trigger d-block"
-              href="#pablo"
-              onClick={(e) => {
-                e.preventDefault();
-                setImage(sideBarImage1);
-              }}
-            >
-              <img alt="..." src={sideBarImage1}></img>
-            </a>
-          </li>
-          <li className={image === sideBarImage2 ? "active" : ""}>
-            <a
-              className="img-holder switch-trigger d-block"
-              href="#pablo"
-              onClick={(e) => {
-                e.preventDefault();
-                setImage(sideBarImage2);
-              }}
-            >
-              <img alt="..." src={sideBarImage2}></img>
-            </a>
-          </li>
-          <li className={image === sideBarImage3 ? "active" : ""}>
-            <a
-              className="img-holder switch-trigger d-block"
-              href="#pablo"
-              onClick={(e) => {
-                e.preventDefault();
-                setImage(sideBarImage3);
-              }}
-            >
-              <img alt="..." src={sideBarImage3}></img>
-            </a>
-          </li>
-          <li className={image === sideBarImage4 ? "active" : ""}>
-            <a
-              className="img-holder switch-trigger d-block"
-              href="#pablo"
-              onClick={(e) => {
-                e.preventDefault();
-                setImage(sideBarImage4);
-              }}
-            >
-              <img alt="..." src={sideBarImage4}></img>
-            </a>
-          </li>
-          <li className="button-container">
-            <div>
-              <Button
-                block
-                className="btn-fill"
-                href="http://www.creative-tim.com/product/light-bootstrap-dashboard-react"
-                rel="noopener noreferrer"
-                target="_blank"
-                variant="info"
-              >
-                Download, it's free!
-              </Button>
-            </div>
-          </li>
-          <li className="button-container">
-            <div>
-              <Button
-                block
-                className="btn-fill"
-                href="http://www.creative-tim.com/product/light-bootstrap-dashboard-react"
-                rel="noopener noreferrer"
-                target="_blank"
-                variant="default"
-              >
-                Checkout docs.
-              </Button>
-            </div>
-          </li>
-          <li className="header-title pro-title text-center">
-            Want more components?
-          </li>
-          <li className="button-container">
-            <div>
-              <Button
-                block
-                className="btn-fill"
-                href="http://www.creative-tim.com/product/light-bootstrap-dashboard-pro-react"
-                rel="noopener noreferrer"
-                target="_blank"
-                variant="primary"
-              >
-                Get The PRO Version!
-              </Button>
-            </div>
-          </li>
-          <li className="header-title" id="sharrreTitle">
-            Thank you for sharing!
-          </li>
-          <li className="button-container mb-4">
-            <Button
-              className="btn-social btn-outline btn-round sharrre"
-              id="twitter"
-              variant="twitter"
-            >
-              <i className="fab fa-twitter"></i>· 256
-            </Button>
-            <Button
-              className="btn-social btn-outline btn-round sharrre"
-              id="facebook"
-              variant="facebook"
-            >
-              <i className="fab fa-facebook-square"></i>· 426
-            </Button>
-          </li>
-        </Dropdown.Menu>
-      </Dropdown>
+            <button onClick={handleSendMessage} style={sendButtonStyle}>
+              Send
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
