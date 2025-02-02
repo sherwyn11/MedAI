@@ -113,7 +113,7 @@ function FixedPlugin() {
       setMessages([...messages, { sender: "user", text: userInput }]);
       setUserInput("");
 
-      const res = await fetch("http://localhost:5000/ask", {
+      const res = await fetch("http://localhost:5002/ask", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
