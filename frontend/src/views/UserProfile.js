@@ -86,7 +86,7 @@ function User() {
                       <Form.Group>
                         <label>Address</label>
                         <Form.Control
-                          defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
+                          defaultValue="Concordia University"
                           placeholder="Home Address"
                           type="text"
                         ></Form.Control>
@@ -130,8 +130,7 @@ function User() {
                         <label>About Me</label>
                         <Form.Control
                           cols="80"
-                          defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
-                          that two seat Lambo."
+                          defaultValue="Person"
                           placeholder="Here can be your description"
                           rows="4"
                           as="textarea"
@@ -171,11 +170,6 @@ function User() {
                   </a>
                   <p className="description">michael24</p>
                 </div>
-                <p className="description text-center">
-                  "Lamborghini Mercy <br></br>
-                  Your chick she so thirsty <br></br>
-                  I'm in that two seat Lambo"
-                </p>
               </Card.Body>
               <hr></hr>
               <div className="button-container mr-auto ml-auto">
