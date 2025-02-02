@@ -25,14 +25,7 @@ import sideBarImage2 from "assets/img/sidebar-2.jpg";
 import sideBarImage3 from "assets/img/sidebar-3.jpg";
 import sideBarImage4 from "assets/img/sidebar-4.jpg";
 
-function FixedPlugin({
-  hasImage,
-  setHasImage,
-  color,
-  setColor,
-  image,
-  setImage,
-}) {
+function FixedPlugin() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
@@ -115,14 +108,20 @@ function FixedPlugin({
     setUserInput(e.target.value);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (userInput.trim()) {
-      setMessages([
-        ...messages,
-        { sender: "user", text: userInput },
-        { sender: "bot", text: "This is a bot response!" }, // You can customize the bot's response logic here
-      ]);
+      setMessages([...messages, { sender: "user", text: userInput }]);
       setUserInput("");
+
+      const res = await fetch("http://localhost:5000/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userInput }),
+      });
+      const data = await res.json();
+      setMessages([...messages, { sender: "user", text: userInput }, ...data]);
     }
   };
   return (
