@@ -17,6 +17,53 @@ import {
 } from "react-bootstrap";
 
 function Dashboard() {
+  // State for Fitbit API data
+const [fitbitData, setFitbitData] = useState(null);
+
+const handleTokenExtraction = () => {
+  const urlParams = new URLSearchParams(window.location.hash.slice(1));
+  const accessToken = urlParams.get("access_token");
+
+  if (accessToken) {
+    fetchFitbitData(accessToken);
+  }
+};
+
+const fetchFitbitData = (token) => {
+  const apiUrl = "https://api.fitbit.com/1/user/-/activities.json"; // Example endpoint for activity data
+  fetch(apiUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      setFitbitData(data);
+      setError(""); // Clear any previous errors
+    })
+    .catch((err) => {
+      console.error("Error fetching Fitbit data:", err);
+      setError("Failed to fetch Fitbit data.");
+    });
+};
+
+// Extract access token when the component mounts or URL changes
+useEffect(() => {
+  if (window.location.hash) {
+    handleTokenExtraction();
+  }
+}, [])
+
+  // Fitbit OAuth integration
+  const CLIENT_ID = "23Q5R5";
+  const REDIRECT_URI = "http://localhost:3000/admin/dashboard"; 
+  const AUTH_URL = `https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=activity%20heartrate%20profile`;
+
+  const handleFitbitLogin = () => {
+    window.location.href = AUTH_URL; // Redirect to Fitbit OAuth
+  }
+
+  
   const [fileName, setFileName] = useState("");
   const [filePreview, setFilePreview] = useState("");
   const [error, setError] = useState("");
@@ -628,6 +675,38 @@ function Dashboard() {
             </Card>
           </Col>
         </Row>
+          {/* Fitbit Login Button */}
+      <div>
+        <button
+          onClick={handleFitbitLogin}
+          style={{
+            backgroundColor: "#28a745",
+            color: "white",
+            padding: "15px",
+            fontSize: "20px",
+            border: "none",
+            borderRadius: "10px",
+            cursor: "pointer",
+          }}
+        >
+          Connect to Fitbit
+        </button>
+      </div>
+
+
+
+      {/* Display Fitbit Data */}
+      {fitbitData ? (
+          <div>
+            <h3>Your Fitbit Activity</h3>
+            <pre>{JSON.stringify(fitbitData, null, 2)}</pre>
+            {/* You can also format the data in a more user-friendly way */}
+          </div>
+        ) : error ? (
+          <p style={{ color: "red" }}>{error}</p>
+        ) : (
+          <p>Waiting for Fitbit data...</p>
+        )}          
       </Container>
     </>
   );
