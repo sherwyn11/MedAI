@@ -65,7 +65,7 @@ function Sidebar({ color, image, routes }) {
               <img src={require("assets/img/reactlogo.png")} alt="..." />
             </div>
           </a>
-          <a className="simple-text">MedAI</a>
+          <a className="simple-text">Med AI</a>
         </div>
         <Nav>
           {routes.map((prop, key) => {
