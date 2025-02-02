@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import ChartistGraph from "react-chartist";
-import "bootstrap/dist/css/bootstrap.min.css";
 // react-bootstrap components
 import {
   Badge,
